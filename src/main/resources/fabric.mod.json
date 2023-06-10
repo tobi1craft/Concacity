@@ -11,7 +11,7 @@
     "repo": "https://github.com/tobi1craft/Concacity"
   },
   "license": "All-Rights-Reserved",
-  "icon": "assets/Concacity/icon.png",
+  "icon": "assets/concacity/icon.png",
   "environment": "*",
   "entrypoints": {
     "client": [
