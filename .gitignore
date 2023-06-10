@@ -1,7 +1,6 @@
 # User-specific stuff
 gradlew*
 
-
 .idea/
 
 *.iml
