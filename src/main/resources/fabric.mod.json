@@ -3,12 +3,12 @@
   "id": "concacity",
   "version": "${version}",
   "name": "Concacity",
-  "description": "Adds various content",
+  "description": "Adds various content useful at some point",
   "authors": [
     "tobi1craft"
   ],
   "contact": {
-    "repo": "https://github.com/tobi1craft/"
+    "repo": "https://github.com/tobi1craft/Concacity"
   },
   "license": "All-Rights-Reserved",
   "icon": "assets/concacity/icon.png",
