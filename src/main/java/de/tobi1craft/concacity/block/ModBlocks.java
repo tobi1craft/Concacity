@@ -16,7 +16,7 @@ import net.minecraft.util.Identifier;
 public class ModBlocks {
 
     public static Item CONCACITY_BLOCK_ITEM;
-    public static final Block CONCACITY_BLOCK = registerBlock("concacity_block", new Block(FabricBlockSettings.create().mapColor(MapColor.BRIGHT_RED)));
+    public static final Block CONCACITY_BLOCK = registerBlock("concacity_block", new Block(FabricBlockSettings.create().mapColor(MapColor.BRIGHT_RED).strength(1F)));
 
     private static Block registerBlock(String name, Block block) {
         CONCACITY_BLOCK_ITEM = registerBlockItem(name, block);
