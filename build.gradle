@@ -6,7 +6,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath group: 'org.yaml', name: 'snakeyaml', version: '1.21'
+        classpath group: 'org.yaml', name: 'snakeyaml', version: '1.27'
     }
 }
 
@@ -84,35 +84,64 @@ java {
 
 jar {
     from("LICENSE") {
-        rename { "${it}_${project.archivesBaseName}" }
+        rename { "${it}_${archives_base_name}" }
     }
 }
 
 
-//tasks.register('updatePublishFile') {
-//    def configurationYAML = ".github/workflows/publish.yml"
-//
-//    inputs.files buildscript.sourceFile
-//    outputs.files configurationYAML
-//
-//    DumperOptions options = new DumperOptions()
-//    options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK)
-//    options.setPrettyFlow(true)
-//    Yaml yaml = new Yaml(options)
-//
-//    def updateGlobalProperties = { cfg, name, version ->
-//        def index = (int) cfg.env.findIndexValues { it ==~ /$name.*/ }[0]
-//        cfg.env.set(index, name + ': ' + version)
-//    }
-//
-//    doLast {
-//        def cfg = yaml.load(new File(configurationYAML).newInputStream())
-//        updateGlobalProperties(cfg, 'VERSION', version + minecraft_version)
-//
-//        FileWriter writer = new FileWriter(configurationYAML)
-//        yaml.dump(cfg, writer)
-//    }
-//}
+tasks.register('updatePublishFile') {
+    def configurationYAML = ".github/workflows/publish.yml"
+
+    inputs.files configurationYAML
+    outputs.files configurationYAML
+
+    DumperOptions options = new DumperOptions()
+    options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK)
+    options.setIndent(2)
+    options.setAllowReadOnlyProperties(true)
+    options.setPrettyFlow(true)
+
+    Yaml yaml = new Yaml(options)
+
+    def updateGlobalProperties = { cfg, name, version ->
+        cfg.env.put(name, version)
+    }
+
+    doLast {
+        def cfg = yaml.load(new File(configurationYAML).newInputStream())
+        updateGlobalProperties(cfg, 'VERSION', mod_version + '+' + minecraft_version)
+        updateGlobalProperties(cfg, 'MINECRAFT_VERSION', minecraft_version)
+        updateGlobalProperties(cfg, 'RELEASE_NAME', 'Concacity v' + mod_version + ' for ' + minecraft_version)
+
+        FileWriter writer = new FileWriter(configurationYAML)
+        yaml.dump(cfg, writer)
+
+    }
+}
+
+loom {
+    runs {
+        datagen {
+            inherit client
+            name "Data Generation"
+            vmArg "-Dfabric-api.datagen"
+            vmArg "-Dfabric-api.datagen.output-dir=${file("src/main/generated")}"
+            vmArg "-Dfabric-api.datagen.modid=${archives_base_name}"
+
+            runDir "build/datagen"
+        }
+    }
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDirs += [
+                    'src/main/generated'
+            ]
+        }
+    }
+}
 
 
 // configure the maven publication
