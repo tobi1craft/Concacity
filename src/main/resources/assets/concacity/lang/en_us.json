@@ -1,4 +1,7 @@
 {
-  "item.concacity.concacity": "test item",
+  "item.concacity.concacity": "Concacity",
+
+  "block.concacity.concacity_block": "Concacity Block",
+
   "group.concacity": "Concacity"
 }
