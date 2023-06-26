@@ -13,11 +13,11 @@ import net.minecraft.util.Identifier;
 
 public class ModItems {
 
-    public static final Item CONCACITY = registerItem("concacity", new Item(new FabricItemSettings()));
+    //public static final Item CONCACITY = registerItem("concacity", new Item(new FabricItemSettings()));
 
 
     public static void addItemsToItemGroup() {
-        addToItemGroup(ModItemGroup.CONCACITY, CONCACITY);
+        //addToItemGroup(ModItemGroup.CONCACITY, CONCACITY);
     }
 
 

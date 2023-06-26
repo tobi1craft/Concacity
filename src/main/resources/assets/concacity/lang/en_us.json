@@ -3,5 +3,9 @@
 
   "block.concacity.concacity_block": "Concacity Block",
 
-  "group.concacity": "Concacity"
+  "group.concacity": "Concacity",
+
+  "text.config.concacity.title": "Concacity Mod Config",
+  "text.config.concacity.section.functions": "Functions",
+  "text.config.concacity.option.no_elytra_durability": "Elytra durability loss on fly"
 }

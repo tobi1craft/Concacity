@@ -1,18 +1,16 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
-  "key": {
-    "#": {
-      "item": "concacity:concacity"
-    }
-  },
   "pattern": [
     "###",
     "###",
     "###"
   ],
+  "key": {
+    "#": {
+      "item": "concacity:concacity"
+    }
+  },
   "result": {
     "item": "concacity:concacity_block"
-  },
-  "show_notification": true
+  }
 }

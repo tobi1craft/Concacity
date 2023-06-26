@@ -1,13 +1,12 @@
 {
   "type": "minecraft:crafting_shapeless",
-  "category": "building",
   "ingredients": [
     {
       "item": "concacity:concacity_block"
     }
   ],
   "result": {
-    "count": 9,
-    "item": "concacity:concacity"
+    "item": "concacity:concacity",
+    "count": 9
   }
 }

@@ -15,11 +15,11 @@ public class ModModelProvider extends FabricModelProvider {
 
     @Override
     public void generateBlockStateModels(BlockStateModelGenerator blockStateModelGenerator) {
-        blockStateModelGenerator.registerCubeAllModelTexturePool(ModBlocks.CONCACITY_BLOCK);
+        //blockStateModelGenerator.registerCubeAllModelTexturePool(ModBlocks.CONCACITY_BLOCK);
     }
 
     @Override
     public void generateItemModels(ItemModelGenerator itemModelGenerator) {
-        itemModelGenerator.register(ModItems.CONCACITY, Models.GENERATED);
+        //itemModelGenerator.register(ModItems.CONCACITY, Models.GENERATED);
     }
 }

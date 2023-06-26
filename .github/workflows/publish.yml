@@ -3,10 +3,10 @@ name: Publish on Github, CurseForge & Modrinth
 - pull_request
 - workflow_dispatch
 env:
-  MINECRAFT_VERSION: 1.20.1
+  MINECRAFT_VERSION: '1.20'
   JAVA_VERSION: 17
-  VERSION: 0.1-SNAPSHOT+1.20.1
-  RELEASE_NAME: Concacity v0.1-SNAPSHOT for 1.20.1
+  VERSION: 0.1+1.20
+  RELEASE_NAME: Concacity v0.1 for 1.20
   GITHUB_TOKEN: ${{ secrets.PUBLISH_GITHUB_TOKEN }}
   MODRINTH_TOKEN: ${{ secrets.PUBLISH_MODRINTH_TOKEN }}
   CURSEFORGE_TOKEN: ${{ secrets.PUBLISH_CURSEFORGE_TOKEN }}

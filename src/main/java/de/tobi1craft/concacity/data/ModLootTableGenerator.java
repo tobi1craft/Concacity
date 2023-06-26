@@ -11,6 +11,6 @@ public class ModLootTableGenerator extends FabricBlockLootTableProvider {
 
     @Override
     public void generate() {
-        addDrop(ModBlocks.CONCACITY_BLOCK);
+        //addDrop(ModBlocks.CONCACITY_BLOCK);
     }
 }
