@@ -7,5 +7,5 @@
 
   "text.config.concacity.title": "Concacity Mod Config",
   "text.config.concacity.section.functions": "Funktionen",
-  "text.config.concacity.option.no_elytra_durability": "Elytra verliert Haltbarkeit"
+  "text.config.concacity.option.elytra_durability_loss": "Elytra verliert Haltbarkeit"
 }

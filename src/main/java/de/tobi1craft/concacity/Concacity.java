@@ -23,6 +23,6 @@ public class Concacity implements ModInitializer {
         ModItems.registerModItems();
         ModBlocks.registerModBlocks();
 
-        EntityElytraEvents.CUSTOM.register(new ElytraDurability());
+        if (!CONFIG.elytra_durability_loss()) EntityElytraEvents.CUSTOM.register(new ElytraDurability());
     }
 }

@@ -1,1 +1,1 @@
-just testing around
+quick fix of config

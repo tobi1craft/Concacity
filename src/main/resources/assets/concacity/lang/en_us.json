@@ -7,5 +7,5 @@
 
   "text.config.concacity.title": "Concacity Mod Config",
   "text.config.concacity.section.functions": "Functions",
-  "text.config.concacity.option.no_elytra_durability": "Elytra durability loss on fly"
+  "text.config.concacity.option.elytra_durability_loss": "Elytra durability loss on fly"
 }
