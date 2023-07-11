@@ -20,8 +20,6 @@ version = project.mod_version
 group = project.maven_group
 
 
-
-
 repositories {
     maven { url 'https://maven.wispforest.io' }
 }
@@ -37,19 +35,21 @@ dependencies {
 
     //OWO (Config etc.)
     annotationProcessor modImplementation("io.wispforest:owo-lib:${project.owo_version}")
-    //modImplementation "io.wispforest:owo-sentinel:${project.owo_version}"
+    include "io.wispforest:owo-sentinel:${project.owo_version}"
 }
 
 processResources {
     inputs.property "version", project.version
     inputs.property "minecraft_version", minecraft_version
     inputs.property "loader_version", loader_version
+    inputs.property "owo_version", owo_version
     filteringCharset "UTF-8"
 
     filesMatching("fabric.mod.json") {
         expand "version": project.version,
                 "minecraft_version": minecraft_version,
-                "loader_version": loader_version
+                "loader_version": loader_version,
+                "owo_version": owo_version
     }
 
 //    filesMatching("**/publish.yml") {
@@ -103,8 +103,7 @@ tasks.register('updatePublishFile') {
 
     Yaml yaml = new Yaml(options)
 
-    def updateGlobalProperties = { cfg, name, version ->
-        cfg.env.put(name, version)
+    def updateGlobalProperties = { cfg, name, version -> cfg.env.put(name, version)
     }
 
     doLast {
@@ -136,9 +135,7 @@ loom {
 sourceSets {
     main {
         resources {
-            srcDirs += [
-                    'src/main/generated'
-            ]
+            srcDirs += ['src/main/generated']
         }
     }
 }

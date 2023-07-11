@@ -3,6 +3,7 @@ package de.tobi1craft.concacity;
 import de.tobi1craft.concacity.block.ModBlocks;
 import de.tobi1craft.concacity.client.ModItemGroup;
 import de.tobi1craft.concacity.event.ElytraDurability;
+import de.tobi1craft.concacity.event.ModEvents;
 import de.tobi1craft.concacity.item.ModItems;
 import de.tobi1craft.concacity.util.ConcacityConfig;
 import net.fabricmc.api.ModInitializer;
@@ -22,7 +23,6 @@ public class Concacity implements ModInitializer {
         ModItemGroup.registerItemGroup();
         ModItems.registerModItems();
         ModBlocks.registerModBlocks();
-
-        if (!CONFIG.elytra_durability_loss()) EntityElytraEvents.CUSTOM.register(new ElytraDurability());
+        ModEvents.registerModEvents();
     }
 }
