@@ -10,4 +10,10 @@ public class ConfigModel {
     @Sync(Option.SyncMode.OVERRIDE_CLIENT)
     @ExcludeFromScreen
     public boolean elytra_durability_loss = true;
+
+    @SectionHeader("discord")
+    public boolean discord_enabled = false;
+    public String token = "";
 }
+
+
