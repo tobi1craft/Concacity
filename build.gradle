@@ -21,8 +21,16 @@ group = project.maven_group
 
 
 repositories {
-    maven { url 'https://maven.wispforest.io' }
     mavenCentral()
+    maven {
+        name = 'Config'
+        url 'https://maven.wispforest.io'
+
+    }
+    maven {
+        name = 'GeckoLib'
+        url 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
+    }
 }
 
 dependencies {
@@ -41,6 +49,9 @@ dependencies {
     implementation("net.dv8tion:JDA:5.0.0-beta.12") {
         exclude module: 'opus-java'
     }
+
+    //GeckoLib (Models)
+    modImplementation "software.bernie.geckolib:geckolib-fabric-${project.minecraft_version}:${project.geckolib_version}"
 }
 
 
@@ -49,13 +60,15 @@ processResources {
     inputs.property "minecraft_version", minecraft_version
     inputs.property "loader_version", loader_version
     inputs.property "owo_version", owo_version
+    inputs.property "geckolib_version", geckolib_version
     filteringCharset "UTF-8"
 
     filesMatching("fabric.mod.json") {
         expand "version": project.version,
                 "minecraft_version": minecraft_version,
                 "loader_version": loader_version,
-                "owo_version": owo_version
+                "owo_version": owo_version,
+                "geckolib_version": geckolib_version
     }
 
 //    filesMatching("**/publish.yml") {
@@ -117,6 +130,8 @@ tasks.register('updatePublishFile') {
         updateGlobalProperties(cfg, 'VERSION', mod_version + '+' + minecraft_version)
         updateGlobalProperties(cfg, 'MINECRAFT_VERSION', minecraft_version)
         updateGlobalProperties(cfg, 'RELEASE_NAME', 'Concacity v' + mod_version + ' for ' + minecraft_version)
+        updateGlobalProperties(cfg, 'OWO_VERSION', owo_version)
+        updateGlobalProperties(cfg, 'GECKOLIB_VERSION', geckolib_version)
 
         FileWriter writer = new FileWriter(configurationYAML)
         yaml.dump(cfg, writer)

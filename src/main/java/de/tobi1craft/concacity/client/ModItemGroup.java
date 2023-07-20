@@ -17,10 +17,10 @@ public class ModItemGroup {
     public static final RegistryKey<ItemGroup> CONCACITY = RegistryKey.of(RegistryKeys.ITEM_GROUP, new Identifier(Concacity.ID, "concacity"));
 
     public static void registerItemGroup() {
-        /*Concacity.LOGGER.info("registering mod item group(s)");
+        Concacity.LOGGER.info("registering mod item group(s)");
         Registry.register(Registries.ITEM_GROUP, CONCACITY, FabricItemGroup.builder()
                 .displayName(Text.translatable("group.concacity"))
-                .icon(() -> new ItemStack(ModItems.CONCACITY))
-                .build());*/
+                .icon(() -> new ItemStack(ModItems.HELPER_SPAWN_EGG))
+                .build());
     }
 }

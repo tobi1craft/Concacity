@@ -8,6 +8,7 @@
     "tobi1craft"
   ],
   "contact": {
+    "homepage": "https://modrinth.com/mod/concacity",
     "repo": "https://github.com/tobi1craft/Concacity",
     "issues": "https://github.com/tobi1craft/Concacity/issues",
     "sources": "https://github.com/tobi1craft/Concacity"
@@ -31,6 +32,7 @@
     "fabric": "*",
     "minecraft": "${minecraft_version}",
     "java": ">=17",
-    "owo": "${owo_version}"
+    "owo": ">=${owo_version}",
+    "geckolib": ">=${geckolib_version}"
   }
 }

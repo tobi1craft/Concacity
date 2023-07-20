@@ -1,11 +1,18 @@
 package de.tobi1craft.concacity.event;
 
 import de.tobi1craft.concacity.Concacity;
+import de.tobi1craft.concacity.client.gui.ModGUIs;
 import net.fabricmc.fabric.api.entity.event.v1.EntityElytraEvents;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.screen.NamedScreenHandlerFactory;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.ScreenHandlerContext;
+import net.minecraft.text.Text;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.AbstractMap;
 import java.util.HashMap;

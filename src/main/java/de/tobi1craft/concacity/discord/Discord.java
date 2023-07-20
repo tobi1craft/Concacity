@@ -29,6 +29,6 @@ public class Discord implements EventListener {
 
     @Override
     public void onEvent(@NotNull GenericEvent event) {
-        if (event instanceof ReadyEvent) LOGGER.info("API is ready!");
+        if (event instanceof ReadyEvent) LOGGER.info("Discord API is ready!");
     }
 }
