@@ -22,6 +22,7 @@ public class ModGUIs extends ScreenHandler {
         this(syncId, inventory, ScreenHandlerContext.EMPTY, MinecraftClient.getInstance().targetedEntity);
     }
 
+    @SuppressWarnings("unused")
     public ModGUIs(int syncId, PlayerInventory inventory, ScreenHandlerContext context, Entity targetedEntity) {
         super(Concacity.SCREEN_HANDLER_TYPE, syncId);
         inv = (Inventory) targetedEntity;
