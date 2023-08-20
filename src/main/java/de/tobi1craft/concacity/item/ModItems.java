@@ -6,11 +6,9 @@ import de.tobi1craft.concacity.entity.ModEntities;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
 import net.minecraft.item.SpawnEggItem;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.Identifier;
 
 public class ModItems {
@@ -20,8 +18,7 @@ public class ModItems {
 
 
     public static void addItemsToItemGroup() {
-        //addToItemGroup(ModItemGroup.CONCACITY, CONCACITY);
-        addToItemGroup(ModItemGroup.CONCACITY, HELPER_SPAWN_EGG);
+        addToItemGroup(HELPER_SPAWN_EGG);
     }
 
 
@@ -29,8 +26,8 @@ public class ModItems {
         return Registry.register(Registries.ITEM, new Identifier(Concacity.ID, name), item);
     }
 
-    private static void addToItemGroup(RegistryKey<ItemGroup> group, Item item) {
-        ItemGroupEvents.modifyEntriesEvent(group).register(entries -> entries.add(item));
+    private static void addToItemGroup(Item item) {
+        ItemGroupEvents.modifyEntriesEvent(ModItemGroup.CONCACITY).register(entries -> entries.add(item));
     }
 
     public static void registerModItems() {

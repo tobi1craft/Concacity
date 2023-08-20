@@ -15,8 +15,8 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
 
 public class ModGUIs extends ScreenHandler {
-    public HelperEntity targetedEntity;
-    public Inventory inv;
+    public final HelperEntity targetedEntity;
+    public final Inventory inv;
 
     public ModGUIs(int syncId, PlayerInventory inventory) {
         this(syncId, inventory, ScreenHandlerContext.EMPTY, MinecraftClient.getInstance().targetedEntity);
