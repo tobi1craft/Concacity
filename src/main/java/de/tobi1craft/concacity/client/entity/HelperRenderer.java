@@ -1,4 +1,4 @@
-package de.tobi1craft.concacity.entity.client;
+package de.tobi1craft.concacity.client.entity;
 
 import de.tobi1craft.concacity.Concacity;
 import de.tobi1craft.concacity.entity.custom.HelperEntity;

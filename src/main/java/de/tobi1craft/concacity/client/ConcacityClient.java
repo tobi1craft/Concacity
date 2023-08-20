@@ -4,7 +4,7 @@ import de.tobi1craft.concacity.client.gui.ModGUIs;
 import de.tobi1craft.concacity.client.key.ModKeys;
 import de.tobi1craft.concacity.client.util.ClientChannels;
 import de.tobi1craft.concacity.entity.ModEntities;
-import de.tobi1craft.concacity.entity.client.HelperRenderer;
+import de.tobi1craft.concacity.client.entity.HelperRenderer;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
