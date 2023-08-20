@@ -1,6 +1,5 @@
 package de.tobi1craft.concacity.entity.goal;
 
-import de.tobi1craft.concacity.Concacity;
 import de.tobi1craft.concacity.entity.custom.HelperEntity;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.mob.MobEntity;

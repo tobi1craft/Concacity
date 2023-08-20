@@ -2,25 +2,19 @@ package de.tobi1craft.concacity.client.gui;
 
 import de.tobi1craft.concacity.Concacity;
 import de.tobi1craft.concacity.entity.custom.HelperEntity;
-import de.tobi1craft.concacity.util.ModChannels;
 import io.wispforest.owo.client.screens.ScreenUtils;
 import io.wispforest.owo.client.screens.SlotGenerator;
-import net.fabricmc.fabric.mixin.transfer.SimpleInventoryMixin;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
-import net.minecraft.server.network.ServerPlayerEntity;
 
 public class ModGUIs extends ScreenHandler {
-    public static HelperInventoryGUI helperInventoryGUI;
-    private final ScreenHandlerContext context;
     public HelperEntity targetedEntity;
     public Inventory inv;
 
@@ -30,7 +24,6 @@ public class ModGUIs extends ScreenHandler {
 
     public ModGUIs(int syncId, PlayerInventory inventory, ScreenHandlerContext context, Entity targetedEntity) {
         super(Concacity.SCREEN_HANDLER_TYPE, syncId);
-        this.context = context;
         inv = (Inventory) targetedEntity;
         this.targetedEntity = (HelperEntity) targetedEntity;
 

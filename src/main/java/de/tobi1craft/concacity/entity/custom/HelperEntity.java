@@ -1,6 +1,5 @@
 package de.tobi1craft.concacity.entity.custom;
 
-import de.tobi1craft.concacity.Concacity;
 import de.tobi1craft.concacity.entity.goal.MineTreeGoal;
 import de.tobi1craft.concacity.inventory.HelperInventory;
 import net.minecraft.entity.EntityType;
