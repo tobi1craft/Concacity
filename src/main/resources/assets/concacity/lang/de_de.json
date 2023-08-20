@@ -7,5 +7,18 @@
 
   "text.config.concacity.title": "Concacity Mod Config",
   "text.config.concacity.section.functions": "Funktionen",
-  "text.config.concacity.option.elytra_durability_loss": "Elytra verliert Haltbarkeit"
+  "text.config.concacity.option.elytra_durability_loss": "Elytra verliert Haltbarkeit",
+  "text.config.concacity.section.discord": "Functions",
+  "text.config.concacity.option.discord_enabled": "Discord Features",
+  "text.config.concacity.option.discord_token": "Discord Token",
+
+  "text.concacity.upgrade_required": "Upgrade Required",
+
+  "text.concacity.button.helper.guard": "Guard",
+  "text.concacity.button.helper.miner": "Miner",
+  "text.concacity.button.helper.carrier": "Carrier",
+  "text.concacity.label.helper.guard.mode": "Guarding Mode",
+  "text.concacity.button.helper.guard.mode.selected": "Attack only selected targets",
+  "text.concacity.button.helper.guard.mode.confirm": "Attack only with confirm",
+  "text.concacity.button.helper.guard.mode.auto": "Attack automatically"
 }

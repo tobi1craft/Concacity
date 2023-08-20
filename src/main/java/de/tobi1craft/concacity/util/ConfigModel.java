@@ -16,7 +16,7 @@ public class ConfigModel {
     @SuppressWarnings("unused")
     public boolean discord_enabled = false;
     @SuppressWarnings("unused")
-    public String token = "";
+    public String discord_token = "";
 }
 
 

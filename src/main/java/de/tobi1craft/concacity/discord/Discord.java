@@ -16,7 +16,7 @@ public class Discord implements EventListener {
     private static final Logger LOGGER = Concacity.LOGGER;
 
     public static void registerDiscord() {
-        JDABuilder builder = JDABuilder.createDefault(CONFIG.token());
+        JDABuilder builder = JDABuilder.createDefault(CONFIG.discord_token());
         builder.setActivity(Activity.playing("Concacity Minecraft Mod"));
         builder.addEventListeners(new Discord());
         JDA jda = builder.build();

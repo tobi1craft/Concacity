@@ -1,7 +1,12 @@
 package de.tobi1craft.concacity.client.gui;
 
 import de.tobi1craft.concacity.Concacity;
+import de.tobi1craft.concacity.client.key.ModKeys;
+import de.tobi1craft.concacity.util.ModPackets;
+import de.tobi1craft.concacity.util.enums.EntityVariables;
+import de.tobi1craft.concacity.util.enums.GUIs;
 import io.wispforest.owo.ui.base.BaseOwoHandledScreen;
+import io.wispforest.owo.ui.component.ButtonComponent;
 import io.wispforest.owo.ui.component.Components;
 import io.wispforest.owo.ui.container.Containers;
 import io.wispforest.owo.ui.container.FlowLayout;
@@ -11,6 +16,9 @@ import net.minecraft.text.Text;
 import org.jetbrains.annotations.NotNull;
 
 public class HelperInventoryGUI extends BaseOwoHandledScreen<FlowLayout, ModGUIs> {
+    public static int mode;
+    public static int upgrade_mode;
+
     public HelperInventoryGUI(ModGUIs handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
     }
@@ -27,36 +35,62 @@ public class HelperInventoryGUI extends BaseOwoHandledScreen<FlowLayout, ModGUIs
                 .horizontalAlignment(HorizontalAlignment.CENTER)
                 .verticalAlignment(VerticalAlignment.CENTER);
 
+        Text mode0 = Text.translatable("text.concacity.button.helper.guard.mode.selected");
+        Text mode1 = Text.translatable("text.concacity.button.helper.guard.mode.confirm");
+        Text mode2 = Text.translatable("text.concacity.button.helper.guard.mode.auto");
+        Text mode;
+
+        switch (HelperInventoryGUI.mode) {
+            case 1 -> mode = mode1;
+            case 2 -> mode = mode2;
+            default -> mode = mode0;
+        }
+        ButtonComponent button;
+        switch (upgrade_mode) {
+            case 1 ->
+            button = Components.button(mode, buttonComponent -> {
+                if (buttonComponent.getMessage().equals(mode0)) {
+                    buttonComponent.setMessage(mode1);
+                    Concacity.CHANNEL.clientHandle().send(new ModPackets.EntityIntegerPacket(handler.targetedEntity.getUuid(), 1, EntityVariables.HELPER_MODE));
+                } else if (buttonComponent.getMessage().equals(mode1)) {
+                    buttonComponent.setMessage(mode0);
+                    Concacity.CHANNEL.clientHandle().send(new ModPackets.EntityIntegerPacket(handler.targetedEntity.getUuid(), 0, EntityVariables.HELPER_MODE));
+                }
+            });
+            case 2 -> button = Components.button(mode, buttonComponent -> {
+                if (buttonComponent.getMessage().equals(mode0)) {
+                    buttonComponent.setMessage(mode1);
+                    Concacity.CHANNEL.clientHandle().send(new ModPackets.EntityIntegerPacket(handler.targetedEntity.getUuid(), 1, EntityVariables.HELPER_MODE));
+                } else if (buttonComponent.getMessage().equals(mode1)) {
+                    buttonComponent.setMessage(mode2);
+                    Concacity.CHANNEL.clientHandle().send(new ModPackets.EntityIntegerPacket(handler.targetedEntity.getUuid(), 2, EntityVariables.HELPER_MODE));
+                } else if (buttonComponent.getMessage().equals(mode2)) {
+                    buttonComponent.setMessage(mode0);
+                    Concacity.CHANNEL.clientHandle().send(new ModPackets.EntityIntegerPacket(handler.targetedEntity.getUuid(), 0, EntityVariables.HELPER_MODE));
+                }
+            });
+            default -> button = Components.button(Text.translatable("text.concacity.upgrade_required"), buttonComponent -> {}).active(false);
+        }
+
+
         rootComponent.child(
-                Containers.verticalScroll(Sizing.content(), Sizing.fill(50),
+                Containers.verticalScroll(Sizing.content(), Sizing.fill(75),
                         Containers.grid(Sizing.content(), Sizing.content(), 9, 2)
-                                .child(Components.label(Text.literal("Test Label 1")).color(Color.BLACK).margins(Insets.of(5)), 0, 0)
-                                .child(Components.checkbox(Text.empty()).margins(Insets.of(5)), 0, 1)
+                                .child(Components.button(Text.translatable("text.concacity.button.helper.miner"), buttonComponent -> switchToMiner()).margins(Insets.of(5)), 0, 0)
+                                .child(Components.button(Text.translatable("text.concacity.button.helper.carrier"), buttonComponent -> switchToCarrier()).margins(Insets.of(5)), 0, 1)
 
-                                .child(Components.label(Text.literal("Label 2")).color(Color.BLACK).margins(Insets.of(5)), 1, 0)
-                                .child(Components.checkbox(Text.empty()).onChanged(box -> Concacity.LOGGER.info("Test")).margins(Insets.of(5)), 1, 1)
+                                .child(Components.label(Text.translatable("text.concacity.label.helper.guard.mode").append(" (")
+                                        .append(ModKeys.keyBinding.getBoundKeyLocalizedText()).append(")")).color(Color.BLACK).margins(Insets.of(5)), 1, 0)
 
-                                .child(Components.label(Text.literal("Label 2")).color(Color.BLACK).margins(Insets.of(5)), 2, 0)
-                                .child(Components.checkbox(Text.empty()).onChanged(box -> Concacity.LOGGER.info("Test")).margins(Insets.of(5)), 2, 1)
 
-                                .child(Components.label(Text.literal("Label 2")).color(Color.BLACK).margins(Insets.of(5)), 3, 0)
-                                .child(Components.checkbox(Text.empty()).onChanged(box -> Concacity.LOGGER.info("Test")).margins(Insets.of(5)), 3, 1)
+                                .child(button.margins(Insets.of(5)), 1, 1)
 
-                                .child(Components.label(Text.literal("Label 2")).color(Color.BLACK).margins(Insets.of(5)), 4, 0)
-                                .child(Components.checkbox(Text.empty()).onChanged(box -> Concacity.LOGGER.info("Test")).margins(Insets.of(5)), 4, 1)
 
-                                .child(Components.label(Text.literal("Label 2")).color(Color.BLACK).margins(Insets.of(5)), 5, 0)
-                                .child(Components.checkbox(Text.empty()).onChanged(box -> Concacity.LOGGER.info("Test")).margins(Insets.of(5)), 5, 1)
 
-                                .child(Components.label(Text.literal("Label 2")).color(Color.BLACK).margins(Insets.of(5)), 6, 0)
-                                .child(Components.checkbox(Text.empty()).onChanged(box -> Concacity.LOGGER.info("Test")).margins(Insets.of(5)), 6, 1)
+                                .child(this.slotAsComponent(0).margins(Insets.of(5)), 4, 1)
 
-                                .child(Components.label(Text.literal("Label 2")).color(Color.BLACK).margins(Insets.of(5)), 7, 0)
-                                .child(Components.checkbox(Text.empty()).onChanged(box -> Concacity.LOGGER.info("Test")).margins(Insets.of(5)), 7, 1)
-
-                                .child(Components.box(Sizing.fill(30), Sizing.fill(30)), 8, 0)
-
-                                .child(this.slotAsComponent(0), 8, 1)
+                                .child(Components.entity(Sizing.fill(20), handler.targetedEntity).allowMouseRotation(true).scaleToFit(true)
+                                        .verticalSizing(Sizing.fill(60)).margins(Insets.of(5)), 5, 0)
 
 
                                 .padding(Insets.of(10))
@@ -65,5 +99,13 @@ public class HelperInventoryGUI extends BaseOwoHandledScreen<FlowLayout, ModGUIs
                                 .horizontalAlignment(HorizontalAlignment.LEFT)
                 )
         );
+    }
+
+    private void switchToMiner() {
+        Concacity.CHANNEL.clientHandle().send(new ModPackets.RequestHelperGUIPacket(handler.targetedEntity.getUuid(), GUIs.MINER));
+    }
+
+    private void switchToCarrier() {
+        Concacity.CHANNEL.clientHandle().send(new ModPackets.RequestHelperGUIPacket(handler.targetedEntity.getUuid(), GUIs.CARRIER));
     }
 }

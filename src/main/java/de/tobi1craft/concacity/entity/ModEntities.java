@@ -19,6 +19,6 @@ public class ModEntities {
 
     public static void registerModEntities() {
         Concacity.LOGGER.info("registering mod entities");
-        FabricDefaultAttributeRegistry.register(ModEntities.HELPER, HelperEntity.createMobAttributes());
+        FabricDefaultAttributeRegistry.register(ModEntities.HELPER, HelperEntity.setAttributes());
     }
 }
