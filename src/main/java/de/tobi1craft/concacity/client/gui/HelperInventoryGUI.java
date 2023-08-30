@@ -4,7 +4,6 @@ import de.tobi1craft.concacity.Concacity;
 import de.tobi1craft.concacity.client.key.ModKeys;
 import de.tobi1craft.concacity.util.ModPackets;
 import de.tobi1craft.concacity.util.enums.EntityVariables;
-import de.tobi1craft.concacity.util.enums.GUIs;
 import io.wispforest.owo.ui.base.BaseOwoHandledScreen;
 import io.wispforest.owo.ui.component.ButtonComponent;
 import io.wispforest.owo.ui.component.Components;
@@ -13,11 +12,11 @@ import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.core.*;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 
 public class HelperInventoryGUI extends BaseOwoHandledScreen<FlowLayout, ModGUIs> {
-    public static int mode;
-    public static int upgrade_mode;
+    private static final Identifier TEXTURE = new Identifier("minecraft", "textures/gui/container/dispenser.png");
 
     public HelperInventoryGUI(ModGUIs handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
@@ -32,6 +31,7 @@ public class HelperInventoryGUI extends BaseOwoHandledScreen<FlowLayout, ModGUIs
     protected void build(FlowLayout rootComponent) {
         rootComponent
                 .surface(Surface.VANILLA_TRANSLUCENT)
+                //.surface(Surface.tiled(TEXTURE, 0, 0))
                 .horizontalAlignment(HorizontalAlignment.CENTER)
                 .verticalAlignment(VerticalAlignment.CENTER);
 
@@ -40,13 +40,13 @@ public class HelperInventoryGUI extends BaseOwoHandledScreen<FlowLayout, ModGUIs
         Text mode2 = Text.translatable("text.concacity.button.helper.guard.mode.auto");
         Text mode;
 
-        switch (HelperInventoryGUI.mode) {
+        switch (handler.mode) {
             case 1 -> mode = mode1;
             case 2 -> mode = mode2;
             default -> mode = mode0;
         }
         ButtonComponent button;
-        switch (upgrade_mode) {
+        switch (handler.upgrade_mode) {
             case 1 ->
             button = Components.button(mode, buttonComponent -> {
                 if (buttonComponent.getMessage().equals(mode0)) {
@@ -102,10 +102,12 @@ public class HelperInventoryGUI extends BaseOwoHandledScreen<FlowLayout, ModGUIs
     }
 
     private void switchToMiner() {
-        Concacity.CHANNEL.clientHandle().send(new ModPackets.RequestHelperGUIPacket(handler.targetedEntity.getUuid(), GUIs.MINER));
+        //TODO: Entity zu Miner
+        Concacity.CHANNEL.clientHandle().send(new ModPackets.GuiPacket(handler.targetedEntity.getUuid()));
     }
 
     private void switchToCarrier() {
-        Concacity.CHANNEL.clientHandle().send(new ModPackets.RequestHelperGUIPacket(handler.targetedEntity.getUuid(), GUIs.CARRIER));
+        //TODO: Entity zu Carrier
+        Concacity.CHANNEL.clientHandle().send(new ModPackets.GuiPacket(handler.targetedEntity.getUuid()));
     }
 }

@@ -17,6 +17,20 @@ public class ConfigModel {
     public boolean discord_enabled = false;
     @SuppressWarnings("unused")
     public String discord_token = "";
+
+    @SectionHeader("helper")
+    @Sync(Option.SyncMode.OVERRIDE_CLIENT)
+    @ExcludeFromScreen
+    @SuppressWarnings("unused")
+    public int helper_upgrade_searchRadius_0 = 20;
+    @Sync(Option.SyncMode.OVERRIDE_CLIENT)
+    @ExcludeFromScreen
+    @SuppressWarnings("unused")
+    public int helper_upgrade_searchRadius_1 = 50;
+    @Sync(Option.SyncMode.OVERRIDE_CLIENT)
+    @ExcludeFromScreen
+    @SuppressWarnings("unused")
+    public int helper_upgrade_searchRadius_2 = 100;
 }
 
 

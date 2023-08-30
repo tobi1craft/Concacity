@@ -13,6 +13,7 @@ import de.tobi1craft.concacity.util.ModChannels;
 import de.tobi1craft.concacity.util.ModPackets;
 import io.wispforest.owo.network.OwoNetChannel;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.resource.featuretoggle.FeatureFlags;
@@ -25,7 +26,10 @@ public class Concacity implements ModInitializer {
     public static final String ID = "concacity";
     public static final Logger LOGGER = LoggerFactory.getLogger("concacity");
     public static final ConcacityConfig CONFIG = ConcacityConfig.createAndLoad();
-    public static final ScreenHandlerType<ModGUIs> SCREEN_HANDLER_TYPE = new ScreenHandlerType<>(ModGUIs::new, FeatureFlags.VANILLA_FEATURES);
+    public static ScreenHandlerType<ModGUIs> SCREEN_HANDLER_TYPE = new ExtendedScreenHandlerType<>(ModGUIs::new);
+    static {
+        SCREEN_HANDLER_TYPE = Registry.register(Registries.SCREEN_HANDLER, new Identifier(ID, "screenhandler"), SCREEN_HANDLER_TYPE);
+    }
     public static final OwoNetChannel CHANNEL = OwoNetChannel.create(new Identifier(ID, "main"));
 
     @Override
@@ -39,7 +43,6 @@ public class Concacity implements ModInitializer {
         ModEvents.registerModEvents();
         ModGoals.registerGoals();
         ModEntities.registerModEntities();
-        Registry.register(Registries.SCREEN_HANDLER, new Identifier(ID, "screenhandler"), SCREEN_HANDLER_TYPE);
         if(CONFIG.discord_enabled()) Discord.registerDiscord();
     }
 }

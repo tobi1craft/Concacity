@@ -3,12 +3,12 @@ package de.tobi1craft.concacity.client.key;
 import de.tobi1craft.concacity.Concacity;
 import de.tobi1craft.concacity.entity.custom.HelperEntity;
 import de.tobi1craft.concacity.util.ModPackets;
-import de.tobi1craft.concacity.util.enums.GUIs;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import org.lwjgl.glfw.GLFW;
 
 public class ModKeys {
@@ -22,11 +22,10 @@ public class ModKeys {
             while (keyBinding.wasPressed()) {
                 if (!(client.targetedEntity instanceof HelperEntity)) {
                     assert client.player != null;
-                    client.player.sendMessage(Text.translatable("text.concacity.error.no_targeted_helper_entity"));
+                    client.player.sendMessage(Text.translatable("text.concacity.error.no_targeted_helper_entity").formatted(Formatting.DARK_RED));
                     return;
                 }
-                GUIs gui = GUIs.GUARD;
-                Concacity.CHANNEL.clientHandle().send(new ModPackets.RequestHelperGUIPacket(client.targetedEntity.getUuid(), gui));
+                Concacity.CHANNEL.clientHandle().send(new ModPackets.GuiPacket(client.targetedEntity.getUuid()));
             }
         });
     }

@@ -8,7 +8,7 @@
   "text.config.concacity.title": "Concacity Mod Config",
   "text.config.concacity.section.functions": "Funktionen",
   "text.config.concacity.option.elytra_durability_loss": "Elytra verliert Haltbarkeit",
-  "text.config.concacity.section.discord": "Functions",
+  "text.config.concacity.section.discord": "Discord",
   "text.config.concacity.option.discord_enabled": "Discord Features",
   "text.config.concacity.option.discord_token": "Discord Token",
 

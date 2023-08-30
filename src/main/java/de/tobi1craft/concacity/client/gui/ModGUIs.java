@@ -10,29 +10,35 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
 
 public class ModGUIs extends ScreenHandler {
     public final HelperEntity targetedEntity;
     public final Inventory inv;
+    private final Inventory inventory;
+    public int upgrade_mode;
+    public int mode;
 
-    public ModGUIs(int syncId, PlayerInventory inventory) {
-        this(syncId, inventory, ScreenHandlerContext.EMPTY, MinecraftClient.getInstance().targetedEntity);
+    public ModGUIs(int syncId, PlayerInventory playerInventory, PacketByteBuf buf) {
+        this(syncId, playerInventory, new SimpleInventory(4), ScreenHandlerContext.EMPTY, MinecraftClient.getInstance().targetedEntity);
+        upgrade_mode = buf.readInt();
+        mode = buf.readInt();
     }
 
     @SuppressWarnings("unused")
-    public ModGUIs(int syncId, PlayerInventory inventory, ScreenHandlerContext context, Entity targetedEntity) {
+    public ModGUIs(int syncId, PlayerInventory playerInventory, Inventory inventory, ScreenHandlerContext context, Entity targetedEntity) {
         super(Concacity.SCREEN_HANDLER_TYPE, syncId);
-        inv = (Inventory) targetedEntity;
+        this.inventory = inventory;
+        this.inv = (Inventory) targetedEntity;
         this.targetedEntity = (HelperEntity) targetedEntity;
 
         SlotGenerator.begin(this::addSlot, 8, 84)
-                //.grid(new SimpleInventory(4), 0, 4, 1)
                 .grid(inv, 0, 2, 1)
-                .playerInventory(inventory);
-
+                .playerInventory(playerInventory);
     }
 
     public static void registerModGUIs() {
@@ -44,7 +50,6 @@ public class ModGUIs extends ScreenHandler {
     public ItemStack quickMove(PlayerEntity player, int slot) {
         return ScreenUtils.handleSlotTransfer(this, slot, 4);
     }
-
 
     @Override
     public boolean canUse(PlayerEntity player) {
