@@ -13,7 +13,9 @@
     "issues": "https://github.com/tobi1craft/Concacity/issues",
     "sources": "https://github.com/tobi1craft/Concacity"
   },
-  "license": "All-Rights-Reserved",
+  "license": [
+    "All-Rights-Reserved"
+  ],
   "icon": "assets/concacity/icon.png",
   "environment": "*",
   "entrypoints": {

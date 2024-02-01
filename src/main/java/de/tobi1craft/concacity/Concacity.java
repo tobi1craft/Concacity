@@ -2,11 +2,10 @@ package de.tobi1craft.concacity;
 
 import de.tobi1craft.concacity.block.ModBlocks;
 import de.tobi1craft.concacity.client.ModItemGroup;
-import de.tobi1craft.concacity.discord.Discord;
 import de.tobi1craft.concacity.entity.ModEntities;
 import de.tobi1craft.concacity.entity.goal.ModGoals;
 import de.tobi1craft.concacity.event.ModEvents;
-import de.tobi1craft.concacity.client.gui.ModGUIs;
+import de.tobi1craft.concacity.client.gui.miner.HelperMinerInventoryHandler;
 import de.tobi1craft.concacity.item.ModItems;
 import de.tobi1craft.concacity.util.ConcacityConfig;
 import de.tobi1craft.concacity.util.ModChannels;
@@ -16,7 +15,6 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
-import net.minecraft.resource.featuretoggle.FeatureFlags;
 import net.minecraft.screen.*;
 import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
@@ -26,7 +24,7 @@ public class Concacity implements ModInitializer {
     public static final String ID = "concacity";
     public static final Logger LOGGER = LoggerFactory.getLogger("concacity");
     public static final ConcacityConfig CONFIG = ConcacityConfig.createAndLoad();
-    public static ScreenHandlerType<ModGUIs> SCREEN_HANDLER_TYPE = new ExtendedScreenHandlerType<>(ModGUIs::new);
+    public static ScreenHandlerType<HelperMinerInventoryHandler> SCREEN_HANDLER_TYPE = new ExtendedScreenHandlerType<>(HelperMinerInventoryHandler::new);
     static {
         SCREEN_HANDLER_TYPE = Registry.register(Registries.SCREEN_HANDLER, new Identifier(ID, "screenhandler"), SCREEN_HANDLER_TYPE);
     }
@@ -43,6 +41,5 @@ public class Concacity implements ModInitializer {
         ModEvents.registerModEvents();
         ModGoals.registerGoals();
         ModEntities.registerModEntities();
-        if(CONFIG.discord_enabled()) Discord.registerDiscord();
     }
 }

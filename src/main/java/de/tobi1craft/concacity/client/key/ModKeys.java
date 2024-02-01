@@ -1,7 +1,7 @@
 package de.tobi1craft.concacity.client.key;
 
 import de.tobi1craft.concacity.Concacity;
-import de.tobi1craft.concacity.entity.custom.HelperEntity;
+import de.tobi1craft.concacity.entity.helper.HelperMinerEntity;
 import de.tobi1craft.concacity.util.ModPackets;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -20,7 +20,7 @@ public class ModKeys {
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (keyBinding.wasPressed()) {
-                if (!(client.targetedEntity instanceof HelperEntity)) {
+                if (!(client.targetedEntity instanceof HelperMinerEntity)) {
                     assert client.player != null;
                     client.player.sendMessage(Text.translatable("text.concacity.error.no_targeted_helper_entity").formatted(Formatting.DARK_RED));
                     return;

@@ -4,7 +4,9 @@ import de.tobi1craft.concacity.Concacity;
 import de.tobi1craft.concacity.client.ModItemGroup;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
+import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.Block;
+import net.minecraft.block.MapColor;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
@@ -13,7 +15,7 @@ import net.minecraft.util.Identifier;
 
 public class ModBlocks {
 
-    //public static final Block CONCACITY_BLOCK = registerBlock("concacity_block", new Block(FabricBlockSettings.create().mapColor(MapColor.BRIGHT_RED).strength(1F)));
+    public static final Block CONCACITY_BLOCK = registerBlock("concacity_block", new Block(FabricBlockSettings.create().mapColor(MapColor.BRIGHT_RED).strength(1F)));
 
     private static Block registerBlock(String name, Block block) {
         registerBlockItem(name, block);

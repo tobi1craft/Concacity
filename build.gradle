@@ -12,7 +12,7 @@ buildscript {
 
 
 plugins {
-    id 'fabric-loom' version '1.2-SNAPSHOT'
+    id 'fabric-loom' version '1.5-SNAPSHOT'
     id 'maven-publish'
 }
 
@@ -30,6 +30,10 @@ repositories {
     maven {
         name = 'GeckoLib'
         url 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
+        content {
+            includeGroupByRegex("software\\.bernie.*")
+            includeGroup("com.eliotlash.mclib")
+        }
     }
 }
 
@@ -45,10 +49,6 @@ dependencies {
     //OWO (Config etc.)
     annotationProcessor modImplementation("io.wispforest:owo-lib:${project.owo_version}")
     include "io.wispforest:owo-sentinel:${project.owo_version}"
-
-    implementation("net.dv8tion:JDA:5.0.0-beta.12") {
-        exclude module: 'opus-java'
-    }
 
     //GeckoLib (Models)
     modImplementation "software.bernie.geckolib:geckolib-fabric-${project.minecraft_version}:${project.geckolib_version}"

@@ -3,12 +3,12 @@ name: Publish on Github, CurseForge & Modrinth
 - pull_request
 - workflow_dispatch
 env:
-  MINECRAFT_VERSION: 1.20.1
+  MINECRAFT_VERSION: 1.20.4
   JAVA_VERSION: 17
-  VERSION: 0.3+1.20.1
-  RELEASE_NAME: Concacity v0.3 for 1.20.1
-  OWO_VERSION: 0.11.1+1.20
-  GECKOLIB_VERSION: 4.2.2
+  VERSION: 0.4.0+1.20.4
+  RELEASE_NAME: Concacity v0.4.0 for 1.20.4
+  OWO_VERSION: 0.12.3+1.20.3
+  GECKOLIB_VERSION: 4.4.2
   GITHUB_TOKEN: ${{ secrets.PUBLISH_GITHUB_TOKEN }}
   MODRINTH_TOKEN: ${{ secrets.PUBLISH_MODRINTH_TOKEN }}
   CURSEFORGE_TOKEN: ${{ secrets.PUBLISH_CURSEFORGE_TOKEN }}
@@ -46,7 +46,7 @@ jobs:
         github-token: ${{env.GITHUB_TOKEN}}
         name: ${{env.RELEASE_NAME}}
         version: ${{env.VERSION}}
-        version-type: release
+        version-type: alpha
         changelog-file: CHANGELOG.md
         loaders: fabric
         game-versions: ${{env.MINECRAFT_VERSION}}

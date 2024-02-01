@@ -1,8 +1,7 @@
-package de.tobi1craft.concacity.entity.custom;
+package de.tobi1craft.concacity.entity.helper;
 
-import de.tobi1craft.concacity.client.gui.ModGUIs;
+import de.tobi1craft.concacity.client.gui.miner.HelperMinerInventoryHandler;
 import de.tobi1craft.concacity.entity.goal.MineTreeGoal;
-import de.tobi1craft.concacity.entity.goal.TestGoal;
 import de.tobi1craft.concacity.inventory.HelperInventory;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.entity.EntityType;
@@ -19,12 +18,10 @@ import net.minecraft.inventory.Inventories;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
 import software.bernie.geckolib.animatable.GeoEntity;
@@ -34,15 +31,16 @@ import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInst
 import software.bernie.geckolib.core.animation.*;
 import software.bernie.geckolib.core.object.PlayState;
 
-public class HelperEntity extends PathAwareEntity implements GeoEntity, HelperInventory, ExtendedScreenHandlerFactory {
+public class HelperMinerEntity extends PathAwareEntity implements GeoEntity, HelperInventory, ExtendedScreenHandlerFactory {
 
     private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
     private final DefaultedList<ItemStack> inventory = DefaultedList.ofSize(3, ItemStack.EMPTY);
+    public boolean cave;
     public int mode;
     public int upgrade_mode;
     public int upgrade_searchRadius;
 
-    public HelperEntity(EntityType<? extends PathAwareEntity> entityType, World world) {
+    public HelperMinerEntity(EntityType<? extends PathAwareEntity> entityType, World world) {
         super(entityType, world);
     }
 
@@ -93,6 +91,7 @@ public class HelperEntity extends PathAwareEntity implements GeoEntity, HelperIn
     public void readNbt(NbtCompound nbt) {
         super.readNbt(nbt);
         Inventories.readNbt(nbt, inventory);
+        cave = nbt.getBoolean("cave");
         mode = nbt.getInt("mode");
         upgrade_mode = nbt.getInt("upgrade_mode");
         upgrade_searchRadius = nbt.getInt("upgrade_searchRadius");
@@ -101,6 +100,7 @@ public class HelperEntity extends PathAwareEntity implements GeoEntity, HelperIn
     @Override
     public NbtCompound writeNbt(NbtCompound nbt) {
         Inventories.writeNbt(nbt, inventory);
+        nbt.putBoolean("cave", cave);
         nbt.putInt("mode", mode);
         nbt.putInt("upgrade_mode", upgrade_mode);
         nbt.putInt("upgrade_searchRadius", upgrade_searchRadius);
@@ -114,7 +114,7 @@ public class HelperEntity extends PathAwareEntity implements GeoEntity, HelperIn
 
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
-        return new ModGUIs(syncId, playerInventory, this, ScreenHandlerContext.create(player.getWorld(), player.getBlockPos()), this);
+        return new HelperMinerInventoryHandler(syncId, playerInventory, this, ScreenHandlerContext.create(player.getWorld(), player.getBlockPos()), this);
     }
 
     @Override
@@ -123,7 +123,13 @@ public class HelperEntity extends PathAwareEntity implements GeoEntity, HelperIn
     }
 
     @Override
+    public boolean shouldCloseCurrentScreen() {
+        return false;
+    }
+
+    @Override
     public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
+        buf.writeBoolean(cave);
         buf.writeInt(upgrade_mode);
         buf.writeInt(mode);
     }

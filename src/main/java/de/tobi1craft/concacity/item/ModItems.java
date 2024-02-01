@@ -13,7 +13,7 @@ import net.minecraft.util.Identifier;
 
 public class ModItems {
 
-    //public static final Item CONCACITY = registerItem("concacity", new Item(new FabricItemSettings()));
+    //TODO: besseres Item zum spawnen / Ritual/Structure ????
     public static final Item HELPER_SPAWN_EGG = registerItem("helper_spawn_egg", new SpawnEggItem(ModEntities.HELPER, 0x0000ff, 0x7a7a7a,new FabricItemSettings()));
 
 

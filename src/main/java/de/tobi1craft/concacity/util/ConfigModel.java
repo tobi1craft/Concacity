@@ -12,12 +12,6 @@ public class ConfigModel {
     @SuppressWarnings("unused")
     public boolean elytra_durability_loss = true;
 
-    @SectionHeader("discord")
-    @SuppressWarnings("unused")
-    public boolean discord_enabled = false;
-    @SuppressWarnings("unused")
-    public String discord_token = "";
-
     @SectionHeader("helper")
     @Sync(Option.SyncMode.OVERRIDE_CLIENT)
     @ExcludeFromScreen

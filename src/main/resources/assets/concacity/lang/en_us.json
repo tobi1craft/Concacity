@@ -8,9 +8,6 @@
   "text.config.concacity.title": "Concacity Mod Config",
   "text.config.concacity.section.functions": "Functions",
   "text.config.concacity.option.elytra_durability_loss": "Elytra durability loss on fly",
-  "text.config.concacity.section.discord": "Discord",
-  "text.config.concacity.option.discord_enabled": "Discord Features",
-  "text.config.concacity.option.discord_token": "Discord Token",
 
   "text.concacity.error.no_targeted_helper_entity": "You are not looking at a Helper!",
 

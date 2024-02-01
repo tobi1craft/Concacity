@@ -1,1 +1,4 @@
--started to add Helping NPCs (Guard)
+- started to add Helping NPCs (Guard)
+- removed Discord integration (unnecessary)
+- cleaned code up
+- updated to 1.20.4 + updated dependencies
