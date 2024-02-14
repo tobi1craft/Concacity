@@ -17,7 +17,7 @@ public class ElytraDurability implements EntityElytraEvents.Custom {
 
     @Override
     public boolean useCustomElytra(LivingEntity entity, boolean tickElytra) {
-        if (Concacity.CONFIG.elytra_durability_loss()) return false;
+        if (!Concacity.CONFIG.elytra()) return false;
         PlayerEntity player = (PlayerEntity) entity;
         ItemStack chestSlot = player.getInventory().armor.get(2);
         if (chestSlot.isDamaged()) {

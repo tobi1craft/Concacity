@@ -1,8 +1,10 @@
 package de.tobi1craft.concacity.util;
 
 import de.tobi1craft.concacity.Concacity;
-import de.tobi1craft.concacity.entity.helper.HelperMinerEntity;
+import de.tobi1craft.concacity.entity.helper.HelperEntity;
+import de.tobi1craft.concacity.entity.helper.HelperForesterEntity;
 import io.wispforest.owo.network.OwoNetChannel;
+import net.minecraft.entity.Entity;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 public class ModChannels {
@@ -12,9 +14,13 @@ public class ModChannels {
     public static void registerChannels() {
         Concacity.LOGGER.info("registering mod channels");
 
-        CHANNEL.registerServerbound(ModPackets.GuiPacket.class, (message, access) -> {
-            if (message.uuid() == null) return;
-            access.player().openHandledScreen((HelperMinerEntity) access.player().getServerWorld().getEntity(message.uuid()));
+        CHANNEL.registerServerbound(ModPackets.HelperGuiPacket.class, (message, access) -> {
+            if (message.entityUUID() == null) return;
+            Entity entity = access.player().getServerWorld().getEntity(message.entityUUID());
+            if(entity instanceof HelperEntity helperEntity) {
+                helperEntity.tabToOpen = message.inventoryTab();
+                access.player().openHandledScreen(helperEntity);
+            }
         });
 
         CHANNEL.registerServerbound(ModPackets.EntityIntegerPacket.class, (message, access) -> {
@@ -23,16 +29,16 @@ public class ModChannels {
             if (message.uuid() == null || message.variable() == null) return;
             switch (message.variable()) {
                 case HELPER_UPGRADE_MODE -> {
-                    HelperMinerEntity helperMinerEntity = (HelperMinerEntity) player.getServerWorld().getEntity(message.uuid());
-                    assert helperMinerEntity != null;
-                    helperMinerEntity.upgrade_mode = message.integer();
-                    helperMinerEntity.markDirty();
+                    HelperForesterEntity helperForesterEntity = (HelperForesterEntity) player.getServerWorld().getEntity(message.uuid());
+                    assert helperForesterEntity != null;
+                    helperForesterEntity.upgrade_mode = message.integer();
+                    helperForesterEntity.markDirty();
                 }
                 case HELPER_MODE -> {
-                    HelperMinerEntity helperMinerEntity = (HelperMinerEntity) player.getServerWorld().getEntity(message.uuid());
-                    assert helperMinerEntity != null;
-                    helperMinerEntity.mode = message.integer();
-                    helperMinerEntity.markDirty();
+                    HelperForesterEntity helperForesterEntity = (HelperForesterEntity) player.getServerWorld().getEntity(message.uuid());
+                    assert helperForesterEntity != null;
+                    helperForesterEntity.mode = message.integer();
+                    helperForesterEntity.markDirty();
                 }
             }
         });

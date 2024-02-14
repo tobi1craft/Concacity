@@ -6,13 +6,14 @@
   "group.concacity": "Concacity",
 
   "text.config.concacity.title": "Concacity Mod Config",
-  "text.config.concacity.section.functions": "Functions",
-  "text.config.concacity.option.elytra_durability_loss": "Elytra durability loss on fly",
+  "text.config.concacity.section.reworks": "Reworks",
+  "text.config.concacity.option.elytra": "Elytra Rework",
 
   "text.concacity.error.no_targeted_helper_entity": "You are not looking at a Helper!",
 
   "text.concacity.upgrade_required": "Upgrade Required",
 
+  "text.concacity.gui.helper.miner": "Miner Configuration",
   "text.concacity.button.helper.guard": "Guard",
   "text.concacity.button.helper.miner": "Miner",
   "text.concacity.button.helper.carrier": "Carrier",

@@ -1,10 +1,10 @@
 package de.tobi1craft.concacity.client;
 
+import de.tobi1craft.concacity.client.entity.helper.HelperForesterRenderer;
 import de.tobi1craft.concacity.client.gui.ModGUIs;
 import de.tobi1craft.concacity.client.key.ModKeys;
 import de.tobi1craft.concacity.client.util.ClientChannels;
 import de.tobi1craft.concacity.entity.ModEntities;
-import de.tobi1craft.concacity.client.entity.HelperMinerRenderer;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -21,6 +21,6 @@ public class ConcacityClient implements ClientModInitializer {
         ModGUIs.registerModGUIs();
         ModKeys.registerModKeys();
 
-        EntityRendererRegistry.register(ModEntities.HELPER, HelperMinerRenderer::new);
+        EntityRendererRegistry.register(ModEntities.HELPER, HelperForesterRenderer::new);
     }
 }

@@ -2,8 +2,11 @@ package de.tobi1craft.concacity.entity.goal;
 
 import de.tobi1craft.concacity.Concacity;
 import de.tobi1craft.concacity.entity.ModEntities;
-import de.tobi1craft.concacity.entity.helper.HelperMinerEntity;
+import de.tobi1craft.concacity.entity.helper.HelperForesterEntity;
 import de.tobi1craft.concacity.util.ItemTransferHelper;
+import de.tobi1craft.concacity.util.ModPackets;
+import de.tobi1craft.concacity.util.enums.AnimationTypes;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
@@ -15,38 +18,43 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.loot.context.LootContextParameterSet;
 import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.GlobalPos;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.RaycastContext;
 import net.minecraft.world.poi.PointOfInterestStorage;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class MineTreeGoal extends Goal {
     private final MobEntity mob;
-    private final HelperMinerEntity helper;
+    private final HelperForesterEntity helper;
     private final double speed;
     private final HashMap<BlockPos, Integer> progress = new HashMap<>();
+    private final List<BlockPos> scaffolding = new ArrayList<>();
     private Path path;
     private BlockPos blockPos;
+    private BlockPos groundPos;
     private boolean finished;
     private boolean arrived;
     private BlockPos timeoutMobPos;
     private int timeout;
-    private boolean mining;
+    private boolean goingDown;
 
     public MineTreeGoal(MobEntity mob, Double speed) {
         this.mob = mob;
-        this.helper = (HelperMinerEntity) mob;
+        this.helper = (HelperForesterEntity) mob;
         this.speed = speed;
         this.finished = false;
         this.setControls(EnumSet.of(Control.MOVE, Control.LOOK));
@@ -60,24 +68,43 @@ public class MineTreeGoal extends Goal {
                 if (world.getBlockState(blockPos.offset(Direction.Axis.Y, -offset)).isOf(Blocks.OAK_LOG)) return false;
             }
             this.blockPos = blockPos;
+            //Untergrund (Block unter Baum) finden
+            for (int offset = 1; blockPos.offset(Direction.Axis.Y, -offset).getY() >= world.getBottomY(); offset++) {
+                BlockPos offsetPos = blockPos.offset(Direction.Axis.Y, -offset);
+                BlockState offsetState = world.getBlockState(offsetPos);
+                if (!offsetState.isOf(Blocks.OAK_LOG) && !offsetState.isAir()) {
+                    groundPos = offsetPos;
+                    break;
+                }
+            }
+            if (groundPos == null) return false; //Falls kein Untergrund gefunden wurde
             world.spawnParticles(ParticleTypes.HEART, blockPos.getX(), blockPos.getY(), blockPos.getZ(), 10, 0, 0, 0, 0);
-            this.path = this.mob.getNavigation().findPathTo(blockPos, 0);
-            return (this.path != null && this.blockPos.getSquaredDistanceFromCenter(this.path.getTarget().getX(), this.blockPos.getY(), this.path.getTarget().getZ()) <= 1);
-        }, this.mob.getBlockPos(), getRadius(this.helper), PointOfInterestStorage.OccupationStatus.ANY).isPresent();
+
+            //Build path
+            this.path = mob.getNavigation().findPathTo(blockPos, 0);
+            if (path == null) return false;
+            List<PathNode> pathNodes = new ArrayList<>();
+            for (int i = 0; i < path.getLength(); i++) {
+                pathNodes.add(path.getNode(i));
+            }
+            pathNodes.add(new PathNode(blockPos.getX(), groundPos.offset(Direction.Axis.Y, 1).getY(), blockPos.getZ()));
+            this.path = new Path(pathNodes, blockPos, true);
+
+            return this.blockPos.getSquaredDistanceFromCenter(this.path.getTarget().getX(), this.blockPos.getY(), this.path.getTarget().getZ()) <= 1;
+        }, this.mob.getBlockPos(), getSearchRadius(this.helper), PointOfInterestStorage.OccupationStatus.ANY).isPresent();
     }
 
     @Override
     public void start() {
-        Concacity.LOGGER.error("start");
         this.finished = false;
         this.arrived = false;
+        this.goingDown = false;
+        this.progress.clear();
+        this.timeout = 0;
         ServerWorld world = (ServerWorld) this.mob.getWorld();
         this.mob.getNavigation().startMovingAlong(this.path, this.speed);
         GlobalPos globalPos = GlobalPos.create(world.getRegistryKey(), this.blockPos);
         this.mob.getBrain().remember(ModEntities.TREE_POINT, globalPos);
-        this.progress.clear();
-        this.timeout = 0;
-        this.mining = false;
     }
 
     @Override
@@ -85,37 +112,58 @@ public class MineTreeGoal extends Goal {
         if (this.finished) return;
 
         ServerWorld world = (ServerWorld) this.mob.getWorld();
+        Inventory inventory = (Inventory) this.mob;
+
+        if (goingDown) {
+            breakDown(world, inventory);
+            return;
+        }
 
         //cancel because of breaking or pathfinding errors
-        if (!world.getBlockState(this.blockPos).isOf(Blocks.OAK_LOG) || (!this.arrived && this.path == null)) {
+        if (!world.getBlockState(this.blockPos).isIn(BlockTags.LOGS) || (!this.arrived && this.path == null)) {
             this.finished = true;
-            //test if mob (Helper) arrived
-        } else if (this.arrived || this.path.isFinished() || this.blockPos.getSquaredDistanceFromCenter(this.mob.getX(), this.blockPos.toCenterPos().getY(), this.mob.getZ()) <= 1) {
+            return;
+        }
+        //test if mob (Helper) arrived
+        if (this.arrived || this.path.isFinished() || ((!world.getBlockState(groundPos.offset(Direction.Axis.Y, 1)).isAir() || !world.getBlockState(groundPos.offset(Direction.Axis.Y, 2)).isAir()) && groundPos.offset(Direction.Axis.Y, 1).toCenterPos().distanceTo(mob.getPos()) <= 1) || groundPos.offset(Direction.Axis.Y, 1).toCenterPos().distanceTo(mob.getPos()) <= 0) {
             this.arrived = true;
             this.path = null;
             this.mob.getNavigation().stop();
-            Inventory inventory = (Inventory) this.mob;
             this.mob.getLookControl().lookAt(this.blockPos.toCenterPos().getX(), this.blockPos.toCenterPos().getY(), this.blockPos.toCenterPos().getZ());
 
             //stack up with scaffolding
             if (stackUp(world, inventory)) return;
 
             if (mine(world, inventory, this.blockPos)) {
-                this.finished = true;
+                this.goingDown = true;
                 world.playSoundAtBlockCenter(this.blockPos, SoundEvents.BLOCK_WOOD_BREAK, SoundCategory.BLOCKS, 1, 1, true);
             }
+            return;
+        }
 
-        } else {
-            if (this.mob.getBlockPos() == this.timeoutMobPos) {
-                if (this.timeout >= 20) {
-                    this.finished = true;
-                } else {
-                    this.timeout++;
-                }
+        BlockPos lookingAt = getLookingAt(false);
+        BlockPos eyesLookingAt = getLookingAt(true);
+        if (world.getBlockState(lookingAt).isIn(BlockTags.LEAVES)) {
+            if (mine(world, inventory, lookingAt))
+                world.playSoundAtBlockCenter(lookingAt, SoundEvents.BLOCK_GRASS_BREAK, SoundCategory.BLOCKS, 1, 1, true);
+            return;
+        } else if (world.getBlockState(eyesLookingAt).isIn(BlockTags.LEAVES)) {
+            if (mine(world, inventory, eyesLookingAt))
+                world.playSoundAtBlockCenter(eyesLookingAt, SoundEvents.BLOCK_GRASS_BREAK, SoundCategory.BLOCKS, 1, 1, true);
+            return;
+        }
+
+
+        if (this.mob.getBlockPos() == this.timeoutMobPos) {
+            if (this.timeout >= 60) {
+                this.scaffolding.clear();
+                this.finished = true;
             } else {
-                this.timeoutMobPos = this.mob.getBlockPos();
-                this.timeout = 0;
+                this.timeout++;
             }
+        } else {
+            this.timeoutMobPos = this.mob.getBlockPos();
+            this.timeout = 0;
         }
     }
 
@@ -131,9 +179,12 @@ public class MineTreeGoal extends Goal {
 
     @Override
     public void stop() {
-        this.mob.getWorld().setBlockBreakingInfo(this.mob.getId(), this.blockPos, 0);
+        this.mob.getWorld().setBlockBreakingInfo(this.mob.getId(), this.blockPos, 10);
         this.path = null;
         this.mob.getNavigation().stop();
+        for (BlockPos pos : progress.keySet()) {
+            mob.getWorld().setBlockBreakingInfo(mob.getId(), pos, 10);
+        }
     }
 
     @Override
@@ -141,9 +192,29 @@ public class MineTreeGoal extends Goal {
         return true;
     }
 
-    private int getRadius(HelperMinerEntity helperMinerEntity) {
+    private @NotNull BlockPos getLookingAt(boolean useEyes) {
+        Vec3d entityPos;
+        if (useEyes) entityPos = mob.getEyePos();
+        else entityPos = mob.getPos();
+        Vec3d entityLook = mob.getRotationVector();
+
+        // Strahl (Ray) erstellen
+        double reachDistance = 1.0; // Maximale Reichweite des Blicks einstellen
+        Vec3d rayTarget = entityPos.add(entityLook.multiply(reachDistance));
+        RaycastContext raycastContext = new RaycastContext(entityPos, rayTarget, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.NONE, mob);
+
+        // Raycasting durchführen
+        BlockHitResult blockHitResult = mob.getWorld().raycast(raycastContext);
+
+        // Blockposition zurückgeben, die die Entität anschaut
+        BlockPos blockPos = blockHitResult.getBlockPos();
+        ((ServerWorld) this.mob.getWorld()).spawnParticles(ParticleTypes.ANGRY_VILLAGER, blockPos.toCenterPos().getX(), blockPos.toCenterPos().getY(), blockPos.toCenterPos().getZ(), 1, 0, 0, 0, 0);
+        return blockPos;
+    }
+
+    private int getSearchRadius(@NotNull HelperForesterEntity helperForesterEntity) {
         int radius = 0;
-        switch (helperMinerEntity.upgrade_searchRadius) {
+        switch (helperForesterEntity.upgrade_searchRadius) {
             case 0 -> radius = Concacity.CONFIG.helper_upgrade_searchRadius_0();
             case 1 -> radius = Concacity.CONFIG.helper_upgrade_searchRadius_1();
             case 2 -> radius = Concacity.CONFIG.helper_upgrade_searchRadius_2();
@@ -152,46 +223,54 @@ public class MineTreeGoal extends Goal {
     }
 
     private boolean stackUp(ServerWorld world, Inventory inventory) {
-        //TODO: (Nach einem Blatt abbauen baut er immer Log ab.)
-        //TODO: Er geht net mehr aufs Scaffolding
-        if (this.blockPos.toCenterPos().getY() - this.mob.getY() >= 4) {
-            if (this.mining) {
-                if (mine(world, inventory, this.mob.getBlockPos().offset(Direction.Axis.Y, 2))) {
-                    world.playSoundAtBlockCenter(this.mob.getBlockPos().offset(Direction.Axis.Y, 2), SoundEvents.BLOCK_GRASS_BREAK, SoundCategory.BLOCKS, 1, 1, true);
-                    PathNode pathNode = new PathNode(this.blockPos.getX(), this.blockPos.getY() - 3, this.blockPos.getZ());
-                    Path jumpPath = new Path(List.of(pathNode), this.blockPos.offset(Direction.Axis.Y, -3), true);
-                    this.mob.getNavigation().startMovingAlong(jumpPath, this.speed);
-                    return true;
-                }
-                return true;
-            }
-            int offset = 5;
-            while (world.getBlockState(this.blockPos.offset(Direction.Axis.Y, -offset)).isAir()) {
-                offset++;
-            }
-            if (world.getBlockState(this.blockPos.offset(Direction.Axis.Y, -offset + 1)).isAir()) {
-                //TODO: Scaffolding aus Inventar
-                //TODO: Dann auch wieder abbauen
-                world.setBlockState(this.blockPos.offset(Direction.Axis.Y, -offset + 1), Blocks.SCAFFOLDING.getDefaultState());
-            }
-            if (world.getBlockState(this.blockPos.offset(Direction.Axis.Y, -4)).isOf(Blocks.SCAFFOLDING)) {
-                if (world.getBlockState(this.mob.getBlockPos().offset(Direction.Axis.Y, 2)).isOf(Blocks.OAK_LEAVES)) {
-                    if (mine(world, inventory, this.mob.getBlockPos().offset(Direction.Axis.Y, 2))) {
-                        world.playSoundAtBlockCenter(this.mob.getBlockPos().offset(Direction.Axis.Y, 2), SoundEvents.BLOCK_GRASS_BREAK, SoundCategory.BLOCKS, 1, 1, true);
-                        PathNode pathNode = new PathNode(this.blockPos.getX(), this.blockPos.getY() - 3, this.blockPos.getZ());
-                        Path jumpPath = new Path(List.of(pathNode), this.blockPos.offset(Direction.Axis.Y, -3), true);
-                        this.mob.getNavigation().startMovingAlong(jumpPath, this.speed);
-                        return true;
-                    }
-                }
+        if (this.blockPos.toCenterPos().getY() - this.mob.getEyeY() <= 5) {
+            return false;
+        }
 
-            }
+        BlockPos offsetPos = groundPos.offset(Direction.Axis.Y, 1);
+        while (world.getBlockState(offsetPos).isOf(Blocks.SCAFFOLDING)) {
+            offsetPos = offsetPos.offset(Direction.Axis.Y, 1);
+        }
+
+        if (world.getBlockState(new BlockPos(blockPos.getX(), mob.getBlockY(), blockPos.getZ())).isOf(Blocks.SCAFFOLDING)) {
+            if (mob.getNavigation().isIdle())
+                mob.getNavigation().startMovingAlong(new Path(List.of(new PathNode(offsetPos.getX(), offsetPos.getY() + 1, offsetPos.getZ())), blockPos, true), speed);
             return true;
         }
-        return false;
+
+        for (int i = 0; i < 3; i++)
+            if (!world.getBlockState(offsetPos.offset(Direction.Axis.Y, i)).isAir()) return true;
+
+        for (int slot = 0; slot < inventory.size(); slot++) {
+            if (inventory.getStack(slot).isOf(Items.SCAFFOLDING)) {
+                inventory.removeStack(slot, 1);
+                world.setBlockState(offsetPos, Blocks.SCAFFOLDING.getDefaultState());
+                world.playSoundAtBlockCenter(offsetPos, SoundEvents.BLOCK_SCAFFOLDING_PLACE, SoundCategory.BLOCKS, 1, 1, true);
+                scaffolding.add(offsetPos);
+                mob.getNavigation().startMovingAlong(new Path(List.of(new PathNode(offsetPos.getX(), offsetPos.getY() + 1, offsetPos.getZ())), blockPos, true), speed);
+                break;
+            }
+        }
+        return true;
     }
 
-    private int getMiningTime(ServerWorld world, ItemStack tool, BlockPos blockPos) {
+    private void breakDown(ServerWorld world, Inventory inventory) {
+        BlockPos oldPos = blockPos;
+        if (scaffolding.isEmpty()) {
+            this.finished = true;
+            return;
+        }
+        if (this.canStart() && blockPos.getX() == oldPos.getX() && blockPos.getY() > oldPos.getY() && blockPos.getZ() == oldPos.getZ()) {
+            this.finished = true;
+            return;
+        }
+
+        if (!(mob.getY() == (int) mob.getY())) return;
+
+        if (mine(world, inventory, scaffolding.get(scaffolding.size() - 1))) scaffolding.remove(scaffolding.size() - 1);
+    }
+
+    private int getMiningTime(@NotNull ServerWorld world, @NotNull ItemStack tool, BlockPos blockPos) {
         float speedMultiplier = 1;
         if (tool.isSuitableFor(world.getBlockState(blockPos))) {
             //TOOL
@@ -222,8 +301,8 @@ public class MineTreeGoal extends Goal {
         else return (int) Math.ceil(1 / damage);
     }
 
-    private boolean mine(ServerWorld world, Inventory inventory, BlockPos blockPos) {
-        this.mining = true;
+    private boolean mine(ServerWorld world, @NotNull Inventory inventory, BlockPos blockPos) {
+        Concacity.CHANNEL.serverHandle(mob.getServer()).send(new ModPackets.HelperAnimationPacket(mob.getUuid(), AnimationTypes.BREAK, true));
         //time (ticks) to mine block
         int ticks = getMiningTime(world, inventory.getStack(0), blockPos);
         int currentProgress = this.progress.get(blockPos) == null ? 0 : this.progress.get(blockPos) + 1;
@@ -232,22 +311,22 @@ public class MineTreeGoal extends Goal {
 
         //mining finished
         if (progress >= ticks) {
-            this.mining = false;
-            for (ItemStack itemStack : world.getBlockState(this.blockPos).getDroppedStacks(new LootContextParameterSet.Builder(world).add(LootContextParameters.ORIGIN, this.blockPos.toCenterPos()).add(LootContextParameters.TOOL, inventory.getStack(0)))) {
+            for (ItemStack itemStack : world.getBlockState(blockPos).getDroppedStacks(new LootContextParameterSet.Builder(world).add(LootContextParameters.ORIGIN, blockPos.toCenterPos()).add(LootContextParameters.TOOL, inventory.getStack(0)))) {
                 ItemTransferHelper.insertStackIntoInventory(itemStack, inventory);
                 if (!itemStack.isEmpty()) {
-                    world.spawnEntity(new ItemEntity(world, this.blockPos.toCenterPos().getX(), this.blockPos.toCenterPos().getY(), this.blockPos.toCenterPos().getZ(), itemStack.copyAndEmpty()));
+                    world.spawnEntity(new ItemEntity(world, blockPos.toCenterPos().getX(), blockPos.toCenterPos().getY(), blockPos.toCenterPos().getZ(), itemStack.copyAndEmpty()));
                 }
             }
             world.breakBlock(blockPos, false, this.mob);
-            world.setBlockBreakingInfo(this.mob.getId(), blockPos, 0);
-            this.progress.put(blockPos, 0);
+            world.setBlockBreakingInfo(this.mob.getId(), blockPos, 10);
+            this.progress.remove(blockPos);
             world.addBlockBreakParticles(blockPos, world.getBlockState(blockPos));
-            return true;
+            Concacity.CHANNEL.serverHandle(mob.getServer()).send(new ModPackets.HelperAnimationPacket(mob.getUuid(), AnimationTypes.BREAK, false));
+            return true; //finished
         } else {
             int animation = Math.round(((float) progress / ticks) * 9f);
             world.setBlockBreakingInfo(this.mob.getId(), blockPos, animation);
         }
-        return false;
+        return false; //unfinished
     }
 }

@@ -1,4 +1,4 @@
-package de.tobi1craft.concacity.client.gui.miner;
+package de.tobi1craft.concacity.client.gui.forester;
 
 import de.tobi1craft.concacity.Concacity;
 import de.tobi1craft.concacity.client.key.ModKeys;
@@ -15,10 +15,10 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 
-public class HelperMinerInventoryGUI extends BaseOwoHandledScreen<FlowLayout, HelperMinerInventoryHandler> {
+public class HelperForesterInventoryGUI extends BaseOwoHandledScreen<FlowLayout, HelperForesterInventoryHandler> {
     private static final Identifier TEXTURE = new Identifier("minecraft", "textures/gui/container/dispenser.png");
 
-    public HelperMinerInventoryGUI(HelperMinerInventoryHandler handler, PlayerInventory inventory, Text title) {
+    public HelperForesterInventoryGUI(HelperForesterInventoryHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
     }
 
@@ -86,10 +86,17 @@ public class HelperMinerInventoryGUI extends BaseOwoHandledScreen<FlowLayout, He
                         .child(button.margins(Insets.of(5)), 1, 1)
 
 
-                        .child(this.slotAsComponent(0).margins(Insets.of(5)), 4, 1)
+                        .child(this.slotAsComponent(0).margins(Insets.of(5)), 2, 0)
+                        .child(this.slotAsComponent(1).margins(Insets.of(5)), 2, 1)
+                        .child(this.slotAsComponent(2).margins(Insets.of(5)), 3, 0)
+                        .child(this.slotAsComponent(3).margins(Insets.of(5)), 3, 1)
+                        .child(this.slotAsComponent(4).margins(Insets.of(5)), 4, 0)
+                        .child(this.slotAsComponent(5).margins(Insets.of(5)), 4, 1)
+                        .child(this.slotAsComponent(6).margins(Insets.of(5)), 5, 0)
+                        .child(this.slotAsComponent(7).margins(Insets.of(5)), 5, 1)
 
                         .child(Components.entity(Sizing.fill(20), handler.helperEntity).allowMouseRotation(true).scaleToFit(true)
-                                .verticalSizing(Sizing.fill(60)).margins(Insets.of(5)), 5, 0)
+                                .verticalSizing(Sizing.fill(60)).margins(Insets.of(5)), 8, 0)
 
 
                         .padding(Insets.of(10))
@@ -102,11 +109,11 @@ public class HelperMinerInventoryGUI extends BaseOwoHandledScreen<FlowLayout, He
 
     private void switchToMiner() {
         //TODO: Entity zu Miner
-        Concacity.CHANNEL.clientHandle().send(new ModPackets.GuiPacket(handler.helperEntity.getUuid()));
+        Concacity.CHANNEL.clientHandle().send(new ModPackets.HelperGuiPacket(handler.helperEntity.getUuid(), handler.helperEntity.tabToOpen));
     }
 
     private void switchToCarrier() {
         //TODO: Entity zu Carrier
-        Concacity.CHANNEL.clientHandle().send(new ModPackets.GuiPacket(handler.helperEntity.getUuid()));
+        Concacity.CHANNEL.clientHandle().send(new ModPackets.HelperGuiPacket(handler.helperEntity.getUuid(), handler.helperEntity.tabToOpen));
     }
 }
